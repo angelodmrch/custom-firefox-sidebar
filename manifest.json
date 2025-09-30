@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Sidebar + Context Menu",
+  "version": "1.0",
+  "description": "Sidebar with context menu via toolbar icon",
+  "sidebar_action": {
+    "default_panel": "newtab.html",
+    "default_title": "My Sidebar"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Quick Site Access"
+  }, 
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": ["tabs", "storage", "contextMenus"],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  }
+}

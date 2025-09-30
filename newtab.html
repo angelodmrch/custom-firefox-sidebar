@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My Tab</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      flex: 0 0 auto;
+      background: #202124;
+      color: white;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #333;
+      min-height: 32px;
+    }
+
+    label {
+      margin: 0;
+      font-size: 11px;
+      color: #e8e8e8;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    select {
+      padding: 3px 6px;
+      font-size: 11px;
+      border: 1px solid #555;
+      border-radius: 3px;
+      background: #333;
+      color: white;
+      flex: 1;
+      min-width: 100px;
+      cursor: pointer;
+      height: 22px;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #4285f4;
+      box-shadow: 0 0 0 1px rgba(66, 133, 244, 0.3);
+    }
+
+    select option {
+      background: #333;
+      color: white;
+      padding: 2px 4px;
+    }
+
+    .main-content {
+      flex: 1;
+      background: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 13px;
+      padding: 20px;
+    }
+
+    .help-text {
+      text-align: center;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <label for="pageSelect">Site:</label>
+      <select id="pageSelect">
+        <option value="">Select a site...</option>
+      </select>
+    </div>
+  </header>
+  
+  <div class="main-content">
+    <div class="help-text">
+      <p>Select a site from the dropdown above</p>
+    </div>
+  </div>
+
+  <script src="newtab.js"></script>
+</body>
+</html>

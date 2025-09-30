@@ -1,0 +1,6 @@
+[
+  { "label": "ChatGPT", "url": "https://chat.openai.com/" },
+  { "label": "Grok", "url": "https://grok.com/" },
+  { "label": "Copilot", "url": "https://copilot.microsoft.com/" },
+  { "label": "DeepSeek", "url": "https://www.deepseek.com/" }
+]
