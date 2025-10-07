@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Sidebar + Context Menu",
+  "name": "Custom Sidebar",
   "version": "1.0",
-  "description": "Sidebar with context menu via toolbar icon",
+  "description": "Custom Sidebar",
   "sidebar_action": {
     "default_panel": "newtab.html",
-    "default_title": "My Sidebar"
+    "default_title": "Custom Sidebar"
   },
   "action": {
     "default_popup": "popup.html",
