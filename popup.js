@@ -27,22 +27,22 @@ async function loadPopupOptions() {
       `;
       
       optionItem.addEventListener('click', async () => {
-        // Save selection
-        await browser.storage.local.set({ 
-          lastSite: option.url, 
-          lastSiteLabel: option.label 
-        });
-        
-        // Get current active tab and navigate
-        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-        if (tabs[0]) {
-          browser.tabs.update(tabs[0].id, { url: option.url });
-        } else {
-          browser.tabs.create({ url: option.url });
+        try {
+          // Save selection
+          await browser.storage.local.set({ 
+            lastSite: option.url, 
+            lastSiteLabel: option.label 
+          });
+          
+          // Open sidebar first
+          await browser.sidebarAction.open();
+          
+          // Close popup
+          window.close();
+          
+        } catch (error) {
+          console.error('Error opening sidebar:', error);
         }
-        
-        // Close popup
-        window.close();
       });
       
       optionsList.appendChild(optionItem);

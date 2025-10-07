@@ -1,11 +1,19 @@
 const select = document.getElementById("pageSelect");
 let availableOptions = []; // Store loaded options
 
+
+browser.runtime.onMessage.addListener((message) => {
+  if (message.action === "menuClicked") {
+    console.log("Context menu was clicked:", message.menuId);
+    // Handle the action in your sidebar
+  }
+});
+
 // Load options from storage and populate dropdown
 async function loadOptions() {
   try {
     // First try to load from browser storage (saved custom options)
-    const { customOptions } = await browser.storage.local.get("customOptions");
+    const { customOptions, defaultOption } = await browser.storage.local.get(["customOptions", "defaultOption"]);
     
     let options = customOptions;
     
@@ -22,10 +30,10 @@ async function loadOptions() {
     select.innerHTML = "";
 
     // Add a default option
-    const defaultOption = document.createElement("option");
-    defaultOption.value = "";
-    defaultOption.textContent = "Select a site...";
-    select.appendChild(defaultOption);
+    const defaultOptionEl = document.createElement("option");
+    defaultOptionEl.value = "";
+    defaultOptionEl.textContent = "Select a site...";
+    select.appendChild(defaultOptionEl);
 
     // Populate dropdown
     options.forEach((opt, index) => {
@@ -35,15 +43,28 @@ async function loadOptions() {
       select.appendChild(optionEl);
     });
 
-    // Load last selected option from storage and auto-redirect
+    // Check if there's a default option set
+    if (defaultOption) {
+      // Find the label for the default option
+      const defaultOpt = options.find(opt => opt.url === defaultOption);
+      if (defaultOpt) {
+        select.value = defaultOption;
+        updateSidebarTitle(defaultOpt.label);
+        // Auto-redirect to the default option
+        location.href = defaultOption;
+        return;
+      }
+    }
+
+    // If no default option, check for last selected option
     const { lastSite, lastSiteLabel } = await browser.storage.local.get(["lastSite", "lastSiteLabel"]);
-    if (lastSite) {
+    if (lastSite && !defaultOption) {
       select.value = lastSite;
       // Update sidebar title to show the last selected option
       if (lastSiteLabel) {
         updateSidebarTitle(lastSiteLabel);
       }
-      // Auto-redirect to the last selected site
+      // Auto-redirect to the last selected site only if no default is set
       location.href = lastSite;
     } else {
       // Set default title if no option was previously selected
@@ -54,6 +75,14 @@ async function loadOptions() {
   }
 }
 
+// Listen for storage changes (when popup sets lastSite)
+browser.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local' && changes.lastSite) {
+    // Reload the page to apply the new selection
+    location.reload();
+  }
+});
+
 select.addEventListener("change", () => {
   const url = select.value;
   if (url) {
@@ -61,7 +90,7 @@ select.addEventListener("change", () => {
     const selectedOption = select.options[select.selectedIndex];
     const selectedLabel = selectedOption.textContent;
     
-    // Save selection
+    // Save selection as last site (but don't override default)
     browser.storage.local.set({ lastSite: url, lastSiteLabel: selectedLabel });
     
     // Update sidebar title
@@ -71,21 +100,6 @@ select.addEventListener("change", () => {
     location.href = url;
   }
 });
-
-// Function to update the sidebar title
-function updateSidebarTitle(label) {
-  try {
-    // Update the document title (which affects the sidebar title)
-    document.title = label || "My Sidebar";
-    
-    // Also try to update via browser API if available
-    if (browser.sidebarAction && browser.sidebarAction.setTitle) {
-      browser.sidebarAction.setTitle({ title: label || "My Sidebar" });
-    }
-  } catch (error) {
-    console.log("Could not update sidebar title:", error);
-  }
-}
 
 // Function to update the sidebar title
 function updateSidebarTitle(label) {

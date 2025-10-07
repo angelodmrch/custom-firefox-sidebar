@@ -1,6 +1,7 @@
 const container = document.getElementById("optionsContainer");
 const saveBtn = document.getElementById("saveBtn");
 const addBtn = document.getElementById("addBtn");
+const defaultSelect = document.getElementById("defaultSelect");
 
 let itemCounter = 0;
 
@@ -30,6 +31,7 @@ function createItemElement(label = "", url = "", index = null) {
 function addItem() {
   const itemElement = createItemElement();
   container.appendChild(itemElement);
+  updateDefaultSelect();
 }
 
 function removeItem(itemId) {
@@ -39,8 +41,35 @@ function removeItem(itemId) {
   if (itemElement) {
     itemElement.remove();
     console.log("Item removed successfully");
+    updateDefaultSelect();
   } else {
     console.log("Item not found");
+  }
+}
+
+function updateDefaultSelect() {
+  const currentDefault = defaultSelect.value;
+  defaultSelect.innerHTML = '<option value="">No default (show selector)</option>';
+  
+  const itemContainers = container.querySelectorAll(".item-container");
+  itemContainers.forEach((itemContainer) => {
+    const labelInput = itemContainer.querySelector('[data-type="label"]');
+    const urlInput = itemContainer.querySelector('[data-type="url"]');
+    
+    const label = labelInput.value.trim();
+    const url = urlInput.value.trim();
+    
+    if (label && url) {
+      const option = document.createElement("option");
+      option.value = url;
+      option.textContent = label;
+      defaultSelect.appendChild(option);
+    }
+  });
+  
+  // Restore previous selection if it still exists
+  if (currentDefault) {
+    defaultSelect.value = currentDefault;
   }
 }
 
@@ -48,7 +77,7 @@ async function loadOptions() {
   let options;
   
   // First try to load from browser storage (saved custom options)
-  const { customOptions } = await browser.storage.local.get("customOptions");
+  const { customOptions, defaultOption } = await browser.storage.local.get(["customOptions", "defaultOption"]);
   
   if (customOptions && customOptions.length > 0) {
     // Use saved custom options
@@ -68,7 +97,22 @@ async function loadOptions() {
     container.appendChild(itemElement);
     itemCounter = Math.max(itemCounter, index + 1);
   });
+  
+  // Update default select dropdown
+  updateDefaultSelect();
+  
+  // Set the current default option
+  if (defaultOption) {
+    defaultSelect.value = defaultOption;
+  }
 }
+
+// Add event listeners to update default select when inputs change
+container.addEventListener('input', (e) => {
+  if (e.target.matches('[data-type="label"], [data-type="url"]')) {
+    updateDefaultSelect();
+  }
+});
 
 saveBtn.addEventListener("click", async () => {
   const newOptions = [];
@@ -87,7 +131,13 @@ saveBtn.addEventListener("click", async () => {
     }
   });
   
-  await browser.storage.local.set({ customOptions: newOptions });
+  const defaultOption = defaultSelect.value;
+  
+  await browser.storage.local.set({ 
+    customOptions: newOptions,
+    defaultOption: defaultOption
+  });
+  
   alert("Options saved! Refresh new tab to apply.");
 });
 
