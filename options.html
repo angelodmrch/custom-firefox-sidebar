@@ -4,66 +4,177 @@
   <meta charset="utf-8">
   <title>Extension Options</title>
   <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f9f9f9;
+      --bg-accent: #f0f8ff;
+      --text-primary: #000000;
+      --text-secondary: #333333;
+      --text-accent: #2196F3;
+      --border-color: #ddd;
+      --border-light: #ccc;
+      --input-bg: #ffffff;
+      --button-success: #4CAF50;
+      --button-primary: #2196F3;
+      --button-danger: #f44336;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #2b2a33;
+        --bg-secondary: #42414d;
+        --bg-accent: #1e3a5f;
+        --text-primary: #fbfbfe;
+        --text-secondary: #cfcfd8;
+        --text-accent: #66b3ff;
+        --border-color: #52525e;
+        --border-light: #5b5b66;
+        --input-bg: #38373e;
+        --button-success: #5cbf60;
+        --button-primary: #0078d4;
+        --button-danger: #ff6b6b;
+        --shadow: rgba(0, 0, 0, 0.3);
+      }
+    }
+
     body {
-      font-family: sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       padding: 20px;
       max-width: 600px;
+      margin: 0 auto;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
     }
+
+    h1 {
+      color: var(--text-primary);
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+
     .item-container {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      background-color: #f9f9f9;
+      padding: 15px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--bg-secondary);
+      transition: box-shadow 0.2s;
     }
+
+    .item-container:hover {
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
     .item-inputs {
       flex: 1;
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
+
     input, select {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
+      padding: 10px 12px;
+      border: 1px solid var(--border-light);
+      border-radius: 6px;
       flex: 1;
+      font-size: 14px;
+      background-color: var(--input-bg);
+      color: var(--text-primary);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--text-accent);
+      box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+    }
+
     button {
-      padding: 8px 12px;
+      padding: 10px 16px;
       margin: 5px;
       border: none;
-      border-radius: 3px;
+      border-radius: 6px;
       cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
     }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
     #addBtn {
-      background-color: #4CAF50;
+      background-color: var(--button-success);
       color: white;
     }
+
+    #addBtn:hover {
+      background-color: #45a049;
+    }
+
     #saveBtn {
-      background-color: #2196F3;
+      background-color: var(--button-primary);
       color: white;
     }
+
+    #saveBtn:hover {
+      background-color: #1976d2;
+    }
+
     .remove-btn {
-      background-color: #f44336;
+      background-color: var(--button-danger);
       color: white;
-      margin-left: 10px;
+      margin-left: 12px;
     }
+
+    .remove-btn:hover {
+      background-color: #d32f2f;
+    }
+
     .controls {
       margin: 20px 0;
+      text-align: center;
     }
+
     .default-option {
-      margin-bottom: 20px;
-      padding: 15px;
-      border: 2px solid #2196F3;
-      border-radius: 5px;
-      background-color: #f0f8ff;
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 2px solid var(--text-accent);
+      border-radius: 10px;
+      background-color: var(--bg-accent);
     }
+
     .default-option label {
       display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: #2196F3;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: var(--text-accent);
+      font-size: 16px;
+    }
+
+    .default-option select {
+      width: 100%;
+      max-width: none;
+    }
+
+    /* Dark mode specific adjustments */
+    @media (prefers-color-scheme: dark) {
+      input::placeholder {
+        color: #8f8f9d;
+      }
+
+      input:focus, select:focus {
+        box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.3);
+      }
     }
   </style>
 </head>

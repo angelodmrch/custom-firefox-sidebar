@@ -1,13 +1,19 @@
 const select = document.getElementById("pageSelect");
 let availableOptions = []; // Store loaded options
 
-
-browser.runtime.onMessage.addListener((message) => {
-  if (message.action === "menuClicked") {
-    console.log("Context menu was clicked:", message.menuId);
-    // Handle the action in your sidebar
+// Apply theme class to body based on browser preference
+function applyTheme() {
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.body.classList.add('dark-theme');
+  } else {
+    document.body.classList.remove('dark-theme');
   }
-});
+}
+
+// Listen for theme changes
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
+}
 
 // Load options from storage and populate dropdown
 async function loadOptions() {
@@ -75,11 +81,22 @@ async function loadOptions() {
   }
 }
 
-// Listen for storage changes (when popup sets lastSite)
+// Listen for storage changes (when popup sets lastSite or forces reload)
 browser.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'local' && changes.lastSite) {
-    // Reload the page to apply the new selection
-    location.reload();
+  if (areaName === 'local' && (changes.lastSite || changes.forceReload)) {
+    // Check if this is a force reload from popup
+    if (changes.forceReload) {
+      // Get the last site and navigate to it
+      browser.storage.local.get(['lastSite', 'lastSiteLabel']).then(({ lastSite, lastSiteLabel }) => {
+        if (lastSite) {
+          updateSidebarTitle(lastSiteLabel);
+          location.href = lastSite;
+        }
+      });
+    } else {
+      // Regular reload for other storage changes
+      location.reload();
+    }
   }
 });
 
@@ -116,4 +133,6 @@ function updateSidebarTitle(label) {
   }
 }
 
+// Apply theme on load
+applyTheme();
 loadOptions();
