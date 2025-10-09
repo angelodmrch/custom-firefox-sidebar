@@ -143,4 +143,32 @@ saveBtn.addEventListener("click", async () => {
 
 addBtn.addEventListener("click", addItem);
 
+// Add event listener for default option changes
+defaultSelect.addEventListener("change", async () => {
+  try {
+    const defaultOption = defaultSelect.value;
+    
+    // Save the new default option immediately
+    await browser.storage.local.set({ 
+      defaultOption: defaultOption,
+      forceReload: Date.now() // Use forceReload to trigger sidebar reload
+    });
+    
+    console.log("Default option changed to:", defaultOption);
+    
+    // Just save the change - the sidebar will detect it via storage listener
+    // No need to try close/open from options page
+    
+    // Optional: Show a brief feedback to the user
+    const originalText = defaultSelect.style.backgroundColor;
+    defaultSelect.style.backgroundColor = "#4CAF50";
+    setTimeout(() => {
+      defaultSelect.style.backgroundColor = originalText;
+    }, 200);
+    
+  } catch (error) {
+    console.error("Error saving default option:", error);
+  }
+});
+
 loadOptions();

@@ -83,17 +83,35 @@ async function loadOptions() {
 
 // Listen for storage changes (when popup sets lastSite or forces reload)
 browser.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'local' && (changes.lastSite || changes.forceReload)) {
-    // Check if this is a force reload from popup
+  if (areaName === 'local') {
+    // Handle force reload from popup or options
     if (changes.forceReload) {
-      // Get the last site and navigate to it
-      browser.storage.local.get(['lastSite', 'lastSiteLabel']).then(({ lastSite, lastSiteLabel }) => {
-        if (lastSite) {
+      // Check if there's a new default option or just reload
+      browser.storage.local.get(['defaultOption', 'lastSite', 'lastSiteLabel']).then(({ defaultOption, lastSite, lastSiteLabel }) => {
+        if (defaultOption) {
+          // Navigate to the new default option
+          const selectedOption = availableOptions.find(opt => opt.url === defaultOption);
+          if (selectedOption) {
+            updateSidebarTitle(selectedOption.label);
+            // Don't update icon here - let the page load event handle it
+            location.href = defaultOption;
+          } else {
+            // Fallback to reload if option not found
+            location.reload();
+          }
+        } else if (lastSite) {
+          // Fallback to last site
           updateSidebarTitle(lastSiteLabel);
+          // Don't update icon here - let the page load event handle it
           location.href = lastSite;
+        } else {
+          // Just reload
+          location.reload();
         }
       });
-    } else {
+    }
+    // Handle other storage changes
+    else if (changes.lastSite || changes.defaultOption) {
       // Regular reload for other storage changes
       location.reload();
     }
@@ -110,24 +128,20 @@ select.addEventListener("change", () => {
     // Save selection as last site (but don't override default)
     browser.storage.local.set({ lastSite: url, lastSiteLabel: selectedLabel });
     
-    // Update sidebar title
+    // Update sidebar title and icon
     updateSidebarTitle(selectedLabel);
+    // Don't update icon here - let the page load event handle it
     
     // Redirect to the selected URL
     location.href = url;
   }
 });
 
-// Function to update the sidebar title
+// Function to update the sidebar title (keep for local document title)
 function updateSidebarTitle(label) {
   try {
     // Update the document title (which affects the sidebar title)
     document.title = label || "My Sidebar";
-    
-    // Also try to update via browser API if available
-    if (browser.sidebarAction && browser.sidebarAction.setTitle) {
-      browser.sidebarAction.setTitle({ title: label || "My Sidebar" });
-    }
   } catch (error) {
     console.log("Could not update sidebar title:", error);
   }

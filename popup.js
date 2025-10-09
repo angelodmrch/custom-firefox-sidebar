@@ -28,46 +28,28 @@ async function loadPopupOptions() {
       
       optionItem.addEventListener('click', async () => {
         try {
-          // Save selection
-          await browser.storage.local.set({ 
-            lastSite: option.url, 
-            lastSiteLabel: option.label 
-          });
+          // Open sidebar FIRST (must be in direct user input handler)
+          try {
+            await browser.sidebarAction.open();
+          } catch (sidebarError) {
+            console.log('Sidebar API call failed:', sidebarError);
+          }
           
-          // Open sidebar first
-          await browser.sidebarAction.open();
-          
-          // Wait a moment for sidebar to load, then navigate to the selected URL
-          setTimeout(async () => {
-            try {
-              // Get all tabs to find the sidebar
-              const tabs = await browser.tabs.query({});
-              
-              // Look for the sidebar tab (newtab.html)
-              const sidebarTab = tabs.find(tab => 
-                tab.url && tab.url.includes('newtab.html')
-              );
-              
-              if (sidebarTab) {
-                // Navigate the sidebar to the selected URL
-                await browser.tabs.update(sidebarTab.id, { url: option.url });
-              }
-            } catch (error) {
-              console.error('Error updating sidebar:', error);
-              // If direct tab update fails, trigger storage change for sidebar to reload
-              await browser.storage.local.set({ 
-                lastSite: option.url, 
-                lastSiteLabel: option.label,
-                forceReload: Date.now() // Add timestamp to force reload
-              });
-            }
-          }, 300);
-          
-          // Close popup
+          // Close popup immediately
           window.close();
           
+          // Save selection as both last site AND default (after sidebar is opened)
+          await browser.storage.local.set({ 
+            lastSite: option.url, 
+            lastSiteLabel: option.label,
+            defaultOption: option.url, // Set as new default
+            forceReload: Date.now() // Use forceReload to trigger navigation
+          });
+          
         } catch (error) {
-          console.error('Error opening sidebar:', error);
+          console.error('Error handling option selection:', error);
+          // Still close the popup even if there's an error
+          window.close();
         }
       });
       
