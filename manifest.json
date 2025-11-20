@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Custom Sidebar",
-  "version": "1.0",
+  "version": "1.01",
   "description": "Custom Sidebar",
   "sidebar_action": {
     "default_panel": "newtab.html",

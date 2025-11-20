@@ -33,7 +33,7 @@ async function createContextMenuItems() {
 }
 
 // Handle menu item clicks
-browser.menus.onClicked.addListener((info, tab) => {
+browser.menus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId.startsWith("site-")) {
     // Extract the index from the menu item ID
     const index = parseInt(info.menuItemId.replace("site-", ""));
@@ -41,15 +41,18 @@ browser.menus.onClicked.addListener((info, tab) => {
     
     if (selectedOption) {
       // Open sidebar FIRST (must be in direct user input handler)
-      browser.sidebarAction.open();
+      await browser.sidebarAction.open();
       
-      // Save as new default and trigger sidebar reload (after opening)
-      browser.storage.local.set({
-        defaultOption: selectedOption.url,
-        lastSite: selectedOption.url,
-        lastSiteLabel: selectedOption.label,
-        forceReload: Date.now()
-      });
+      // Add a small delay to ensure sidebar is fully loaded
+      setTimeout(() => {
+        // Save as new default and trigger sidebar reload (after opening)
+        browser.storage.local.set({
+          defaultOption: selectedOption.url,
+          lastSite: selectedOption.url,
+          lastSiteLabel: selectedOption.label,
+          forceReload: Date.now()
+        });
+      }, 100);
     }
   }
 });
